@@ -5,8 +5,8 @@
 #define FFT_SIZE 512
 #define SAMPLES_COUNT 512
 
-float globalWaveData[SAMPLES_COUNT] = {0.0f};
-float globalFFTData[FFT_SIZE] = {0.0f};
+float guitarFftData[FFT_SIZE] = {0.0f};
+float drumsFftData[FFT_SIZE] = {0.0f};
 
 // --- DEBUT DE LA MAGIE MATHEMATIQUE ---
 // Cette fonction transforme l'onde (time) en fréquences (frequency)
@@ -72,15 +72,25 @@ void ComputeFFT(float *in_raw, float *out_fft)
     }
 }
 
-void AudioProcessCallback(void *bufferData,unsigned int frames){
+void ProcessAudioData(void *bufferData,unsigned int frames,float *destinationFFT){
+    float tempWave[SAMPLES_COUNT] = {0.0f};
+    memset(tempWave, 0, sizeof(tempWave));
     float *samples = (float *)bufferData;
 
     for (unsigned int i = 0;i<frames;i++){
         if (i<SAMPLES_COUNT){
-            globalWaveData[i] = samples[i];
+            tempWave[i] = samples[i];
         }
     }
-    ComputeFFT(globalWaveData, globalFFTData);
+    ComputeFFT(tempWave, destinationFFT);
+}
+
+void GuitarCallBack(void *bufferData,unsigned int frames){
+    ProcessAudioData(bufferData,frames,guitarFftData);
+}
+
+void DrumsCallBack(void *bufferData,unsigned int frames){
+    ProcessAudioData(bufferData,frames,drumsFftData);
 }
 
 int main(){
@@ -92,9 +102,8 @@ int main(){
     PlayMusicStream(guitarTrack);
     PlayMusicStream(drumsTrack);
 
-    AttachAudioStreamProcessor(drumsTrack.stream, AudioProcessCallback);
-
-
+    AttachAudioStreamProcessor(drumsTrack.stream, DrumsCallBack);
+    AttachAudioStreamProcessor(guitarTrack.stream, GuitarCallBack);
 
     float volume = 1.0f;
     float pitch = 1.0f;
@@ -132,15 +141,27 @@ int main(){
 
                 // La hauteur de la barre (Magnitude)
                 // On multiplie par 400 ou plus car les valeurs brutes sont souvent petites
-                float height = globalFFTData[i] * 400 * volume;
+                float height = guitarFftData[i] * 400 * volume;
 
                 // On dessine des rectangles (Barres) plutôt que des lignes, c'est plus lisible pour les fréquences
                 // x, y, width, height
                 // On dessine à "300 - height" pour que ça monte vers le haut
                 DrawRectangle(x, 300 - height, (800 / (FFT_SIZE/2)) - 1, height, MAROON);
 
+            }
+
+            for (int i = 0; i < FFT_SIZE / 2; i++)
+            {
+                // On étale les points sur la largeur de l'écran
+                // i * 800 / 256 pour couvrir tout l'écran
+                int x = i * (800 / (FFT_SIZE/2));
+
+                // La hauteur de la barre (Magnitude)
+                // On multiplie par 400 ou plus car les valeurs brutes sont souvent petites
+                float height = drumsFftData[i] * 400 * volume;
+
                 // Effet miroir (optionnel) : on dessine aussi vers le bas pour faire joli
-                DrawRectangle(x, 300, (800 / (FFT_SIZE/2)) - 1, height, Fade(MAROON, 0.5f));
+                DrawRectangle(x, 300, (800 / (FFT_SIZE/2)) - 1, height, Fade(BLUE, 0.5f));
             }
         EndDrawing();
     }
