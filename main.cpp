@@ -198,7 +198,7 @@ int main(){
         BeginDrawing();
             ClearBackground(RAYWHITE);
             DrawRectangleRec({0,0,freqAreaWidth,freqAreaHeight}, GRAY);
-            DrawText("Utilise les FLECHES pour Pitch/Volume", 10, 10, 20, DARKGRAY);
+            DrawText("Utilise les FLECHES pour Pitch/Volume", 10, 10, 20, WHITE);
             DrawText(TextFormat("Volume: %.2f", volume), 10, 40, 20, BLUE);
             DrawText(TextFormat("Pitch: %.2f", pitch), 10, 70, 20, RED);
 
