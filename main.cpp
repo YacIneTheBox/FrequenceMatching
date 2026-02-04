@@ -152,9 +152,15 @@ void DrumsCallBack(void *bufferData,unsigned int frames){
 }
 
 int main(){
-    InitWindow(800,600,"Frequency Matching");
+    const float screenWidth = 1600;
+    const float screenHeight = 900;
+
+    const float freqAreaWidth = screenWidth / 1.6;
+    const float freqAreaHeight = (float)screenHeight;
+
+    InitWindow(screenWidth, screenHeight, "Frequency Matching");
     InitAudioDevice();
-    Music guitarTrack = LoadMusicStream("piano.mp3");
+    Music guitarTrack = LoadMusicStream("guitar.mp3");
     Music drumsTrack = LoadMusicStream("drums.mp3");
 
     PlayMusicStream(guitarTrack);
@@ -191,29 +197,31 @@ int main(){
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
+            DrawRectangleRec({0,0,freqAreaWidth,freqAreaHeight}, GRAY);
             DrawText("Utilise les FLECHES pour Pitch/Volume", 10, 10, 20, DARKGRAY);
             DrawText(TextFormat("Volume: %.2f", volume), 10, 40, 20, BLUE);
             DrawText(TextFormat("Pitch: %.2f", pitch), 10, 70, 20, RED);
 
-            float barWidth = 800.0f / VISUAL_BARS_COUNT;
+
+            float barWidth = (float)freqAreaWidth / VISUAL_BARS_COUNT;
 
             for (int i = 0; i < VISUAL_BARS_COUNT; i++)
             {
                 // --- GUITARE (Rouge, vers le haut) ---
-                float hGuitar =(smoothGuitar[i] * volume ) / 100;
+                float hGuitar =(smoothGuitar[i] * volume ) / (screenHeight/6);
 
                 // On dessine avec un petit espace entre les barres (-2)
-                DrawRectangle(i * barWidth, 300 - hGuitar, barWidth - 2, hGuitar, MAROON);
+                DrawRectangle(i * barWidth, screenHeight/2 - hGuitar, barWidth - 2, hGuitar, MAROON);
 
                 // Optionnel : Un petit contour pour le style
-                DrawRectangleLines(i * barWidth, 300 - hGuitar, barWidth - 2, hGuitar, RED);
+                DrawRectangleLines(i * barWidth, screenHeight/2 - hGuitar, barWidth - 2, hGuitar, RED);
 
 
                 // --- BATTERIE (Bleu, vers le bas) ---
-                float hDrums = (smoothDrums[i] * volume) / 100;
+                float hDrums = (smoothDrums[i] * volume) / (screenHeight/4);
 
-                DrawRectangle(i * barWidth, 300, barWidth - 2, hDrums, Fade(BLUE, 0.8f));
-                DrawRectangleLines(i * barWidth, 300, barWidth - 2, hDrums, DARKBLUE);
+                DrawRectangle(i * barWidth, screenHeight/2, barWidth - 2, hDrums, Fade(BLUE, 0.8f));
+                DrawRectangleLines(i * barWidth, screenHeight/2, barWidth - 2, hDrums, DARKBLUE);
             }
 
         EndDrawing();
