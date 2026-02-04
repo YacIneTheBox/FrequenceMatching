@@ -6,7 +6,7 @@
 #define FFT_SIZE 8192
 #define SAMPLES_COUNT 8192
 
-#define VISUAL_BARS_COUNT 16 // On veut seulement 16 grosses barres pour le jeu (plus lisible)
+#define VISUAL_BARS_COUNT 32 // On veut seulement 16 grosses barres pour le jeu (plus lisible)
 
 // Ce tableau stockera la hauteur LISSÉE de nos 16 barres
 float smoothGuitar[VISUAL_BARS_COUNT] = {0.0f};
@@ -154,7 +154,7 @@ void DrumsCallBack(void *bufferData,unsigned int frames){
 int main(){
     InitWindow(800,600,"Frequency Matching");
     InitAudioDevice();
-    Music guitarTrack = LoadMusicStream("guitar.mp3");
+    Music guitarTrack = LoadMusicStream("piano.mp3");
     Music drumsTrack = LoadMusicStream("drums.mp3");
 
     PlayMusicStream(guitarTrack);
